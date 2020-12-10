@@ -5,29 +5,44 @@ import App from './components/App';
 // import * as serviceWorker from './serviceWorker';
 
 // 1
+import { setContext } from '@apollo/client/link/context';
 import {
   ApolloProvider,
   ApolloClient,
   createHttpLink,
   InMemoryCache
 } from '@apollo/client';
+import { BrowserRouter } from 'react-router-dom';
+import { AUTH_TOKEN } from './constants';
 
 // 2
 const httpLink = createHttpLink({
   uri: 'http://localhost:4000'
 });
 
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem(AUTH_TOKEN);
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : ''
+    }
+  };
+});
+
 // 3
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache()
 });
 
 // 4
 ReactDOM.render(
-  <ApolloProvider client={client}>
-    <App />
-  </ApolloProvider>,
+  <BrowserRouter>
+    <ApolloProvider client={client}>
+      <App />
+    </ApolloProvider>
+  </BrowserRouter>,
   document.getElementById('root')
 );
 // serviceWorker.unregister();
