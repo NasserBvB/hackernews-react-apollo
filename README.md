@@ -1,2 +1,2 @@
-# Getting Started React and Graphql
+# Getting Started with Graphql using React
 
